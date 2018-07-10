@@ -1,0 +1,12 @@
+{
+    "apiKey": "",
+    "apiSecret": "",
+    "botToken": "",
+    "ownerID": null,
+    "orderFilledAlert": false,
+    "Market": "ECA/BTC",
+    "TimeZone": "Asia/Hong_Kong",
+    "updateOrdersTimeInMin": 1,
+    "updateTradeHistroyTimeInMin": 1.5,
+    "commands": ["/listOpenOrders", "/submitTrade", "/cancelTrade"]
+}

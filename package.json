@@ -1,0 +1,16 @@
+{
+    "name": "cryptopiaecaorderalert",
+    "version": "1.0.0",
+    "description": "Notify u when ur order filled.",
+    "main": "index.js",
+    "scripts": {
+        "test": "\\"
+    },
+    "author": "itD0g",
+    "license": "ISC",
+    "dependencies": {
+        "cryptopia-api": "^1.2.14",
+        "jsonfile": "^4.0.0",
+        "node-telegram-bot-api": "^0.30.0"
+    }
+}
