@@ -23,7 +23,7 @@ updateTradeHistory();
 
 //Telegram Commands Handle
 telegram.onText(/^\/start$/, msg => {
-    if (config.ownerID.length <= 0) {
+    if (config.ownerID.length <= 0 || config.ownerID == null) {
         config.ownerID = msg.from.id
         jsonFile.writeFileSync(configPath, config, { spaces: 2 });
         telegram.sendMessage(msg.chat.id, `You are now the owner of the Bot.\nOnly you are allowed to use all the commands.`, { reply_to_message_id: msg.message_id });
@@ -114,11 +114,18 @@ async function updateOpenOrders() {
         const { Success, Data } = await Cryptopia.getOpenOrders({ Market: config.Market });
         if (!Success) throw new Error("Cryptopia Response Not Success.");
 
+        let IDs = [];
+        let init = (Object.keys(openOrders).length == 0)
         for (var i in Data) {
             let { OrderId, Market, Type, Rate, Amount, Total, Remaining, TimeStamp } = Data[i];
             if (Object.keys(openOrders).includes(OrderId.toString())) continue;
+            IDs.push(OrderId.toString());
             openOrders[OrderId] = { Market, Type, Rate, Amount, Total, Remaining, TimeStamp };
-            telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
+            if (!init) telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
+        }
+        console.log(openOrders);
+        for (var i in openOrders) {
+            if (!IDs.includes(i)) delete openOrders[i];
         }
 
         jsonFile.writeFileSync(openOrdersPath, openOrders, { spaces: 2 });
