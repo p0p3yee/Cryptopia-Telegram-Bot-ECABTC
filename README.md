@@ -13,11 +13,12 @@ A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 1. Download the Project
 2. Run `npm install` in the directory (**Make sure you installed NodeJS**)
 3. Setup your Config in `config[template].json` (**API Key, Api Secret, Bot Token, TimeZone** etc.)
-4. Rename `config[template].json` to `config.json`
+(You should **keep ownerID as default**. It will register your telegram ID once you type `/start` to the bot.)
+4. Rename `config[template].json` to `config.json` 
 5. Rename `ownOpenOrders[template].json` to `ownOpenOrders.json`
-5. Run `node app.js` in the directory
-6. Type `/start` in the telegram chat with your bot.
-7. Done.
+6. Run `node app.js` in the directory
+7. Type `/start` in the telegram chat with your bot.
+8. Done.
 
 ## Help
 
@@ -37,8 +38,26 @@ Q: How do i get Cryptopia API Key and API Secret ?
 
 A: In Cryptopia > Setting > Security > Account Security > Api Setting > Check `Enable API` (If you want to allow Withdraw, Click `Enable Withdrawal` too) > Click `New Key` > Click `Save Changes` > Copy **Api Key** And **Api Secret** To config.json
 
+Q: What are `npm install` and `node app.js` mean ?
+
+A: These are the commands that you can execute after installed NodeJs and they are execute on **cmd** or **Terminal**
+
+Q: How do i execute `npm install` and `node app.js` ? 
+
+A: Open **Terminal** if you are using Linux/Mac, Open **cmd** if you are using Windows, and then type: `cd [directory]`. The `[directory]` is the folder that you just downlaoded. For example: your folder is in `~/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`, then you type `cd ~/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`. Another Example: if your folder is in `C:/Users/abc/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`, then you type `cd C:/Users/abc/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`. After changed directory, you can now type `npm install` or `node app.js`.
+
+Q: Why do i get an Error after execute `node app.js` ?
+
+A: if this look like your error message: 
+`(node:1477) UnhandledPromiseRejectionWarning: privateRequest(), Error on privateRequest: StatusCodeError: 401 - ""`. That means your **apiKey** or **apiSecret** is incorrect. Remember to **Save Changes** in Cryptopia.
+
+Q: Thats not my Error Message !
+
+A: Contact me on [Telegram](https://t.me/itD0g) **OR** Create a **New Issue** in this Repo.
+
 ## Commands 
 
+0. `/help` : List All Commands
 1. `/Balance [Currency]` : Get Specific Currency's Balance in Cryptopia.
 2. `/submitOrder [Buy/Sell] [Price in BTC] [ECA Amount]` : Place Buy/Sell ECA Order.
 3. `/cancelOrder [OrderID]` : Cancel Buy/Sell ECA Order.
@@ -46,7 +65,18 @@ A: In Cryptopia > Setting > Security > Account Security > Api Setting > Check `E
 5. `/Deposit [Currency]` : Get Deposit Address of Specific Currency in Cryptopia.
 6. `/getMarket [Currency_BaseCurrency]` : Get Market of the Specific Market, For example: `/getMarket ECA_BTC`, get ECA_BTC Market.
 7. `/getMarketOrders [Currency_BaseCurrency]` Get Market Orders of the Specific Market, For example: `/getMarketOrders ECA_BTC`, get ECA_BTC Market Orders.
+8. `/enableFilledAlert` : Turn on Order Filled Alert
+9. `/disableFilledAlert` : Turn off Order Filled Alert
+10. `/enableReceiveAlert` : Turn on New Order Received Alert
+11. `/disableReceiveAlert` : Turn off New Order Received Alert
 
+## How to Update the bot ?
+
+1. Follow **Installation** Step 1 - 2
+2. Follow **Installation** Step 4 - 5
+3. Copy your setting in the **old** `config.json` to **new** `config.json` (**Only apiKey, apiSecret, botToken and ownerID(if the ownerID is a number instead of null)**)
+4. Follow **Installation** Step 6 (**Do step 7 too, if the ownerID is null**)
+5. Done.
 
 ## Built With
 

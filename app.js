@@ -60,7 +60,7 @@ telegram.onText(/\/submitOrder (.+)/, async(msg, match) => {
             let { Success, Data } = await Cryptopia.submitTrade({ Market: config.Market, Type: tradeType, Rate: parseFloat(args[1]), Amount: parseFloat(args[2]) });
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             telegram.sendMessage(config.ownerID, `[<b>Order Submitted</b>]\nOrderID: <code>${Data.OrderId}</code>\n${tradeType}ing <b>${args[2]} ${config.Currency}</b>\nAt Price: <b>${args[1]} BTC</b>`, msgOpts);
-            if (Data.FilledOrders.length != 0) {
+            if (Data.FilledOrders.length != 0 && config.orderFilledAlert) {
                 let txt = Data.OrderId == null ? "Completely" : "Partly";
                 telegram.sendMessage(config.ownerID, `<b>Order ${txt} Filled !</b>`, {...msgOpts, reply_to_message_id: msg.message_id });
             }
@@ -154,24 +154,68 @@ telegram.onText(/^\/getMarketOrders (.+)/, async(msg, match) => {
 
 telegram.onText(/^\/help$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `${config.commands.join(", ")}`));
 
+telegram.onText(/^\/enableFilledAlert$/, msg => {
+    if (msg.from.id === config.ownerID) {
+        if (!config.orderFilledAlert) {
+            config.orderFilledAlert = true;
+            jsonFile.writeFileSync(configPath, config, { spaces: 2 });
+            telegram.sendMessage(config.ownerID, `Order Filled Alert is now Enable.`, msgOpts);
+        } else {
+            telegram.sendMessage(config.ownerID, `Order Filled Alert Already Enabled.`, msgOpts);
+        }
+    }
+})
+telegram.onText(/^\/disableFilledAlert$/, msg => {
+    if (msg.from.id === config.ownerID) {
+        if (config.orderFilledAlert) {
+            config.orderFilledAlert = false;
+            jsonFile.writeFileSync(configPath, config, { spaces: 2 });
+            telegram.sendMessage(config.ownerID, `Order Filled Alert is now Disable.`, msgOpts);
+        } else {
+            telegram.sendMessage(config.ownerID, `Order Filled Alert Already Disabled.`, msgOpts);
+        }
+    }
+})
+telegram.onText(/^\/enableReceiveAlert$/, msg => {
+    if (msg.from.id === config.ownerID) {
+        if (!config.orderReceivedAlert) {
+            config.orderReceivedAlert = true;
+            jsonFile.writeFileSync(configPath, config, { spaces: 2 });
+            telegram.sendMessage(config.ownerID, `Order Received Alert is now Enable.`, msgOpts);
+        } else {
+            telegram.sendMessage(config.ownerID, `Order Received Alert Already Enabled.`, msgOpts);
+        }
+    }
+})
+telegram.onText(/^\/disableReceiveAlert$/, msg => {
+    if (msg.from.id === config.ownerID) {
+        if (config.orderReceivedAlert) {
+            config.orderReceivedAlert = false;
+            jsonFile.writeFileSync(configPath, config, { spaces: 2 });
+            telegram.sendMessage(config.ownerID, `Order Received Alert is now Disable.`, msgOpts);
+        } else {
+            telegram.sendMessage(config.ownerID, `Order Received Alert Already Disabled.`, msgOpts);
+        }
+    }
+})
+
 telegram.on("polling_error", error => console.error(error));
 //===
 
 
 //Main Component
 async function updateOpenOrders() {
+    let IDs = [];
+    let init = Object.keys(openOrders).length == 0
     try {
         const { Success, Data } = await Cryptopia.getOpenOrders({ Market: config.Market });
         if (!Success) throw new Error("Cryptopia Response Not Success.");
-
-        let init = Object.keys(openOrders).length == 0
-        let IDs = [];
         for (var i in Data) {
             let { OrderId, Market, Type, Rate, Amount, Total, Remaining, TimeStamp } = Data[i];
             IDs.push(OrderId.toString());
             if (Object.keys(openOrders).includes(OrderId.toString())) {
                 if (openOrders[OrderId].Remaining != Remaining) {
-                    telegram.sendMessage(config.ownerID, `[<b>Partly Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order Partly Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${openOrders[OrderId].Amount - Amount} ${config.Currency}</b> with <b>${openOrders[OrderId].Total - Total} BTC</b>.\n<b>${Remaining} ${config.Currency}</b> to be Filled.`, msgOpts);
+                    if (config.orderFilledAlert) telegram.sendMessage(config.ownerID, `[<b>Partly Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order Partly Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${openOrders[OrderId].Amount - Remaining} ${config.Currency}</b>.\n<b>${Remaining} ${config.Currency}</b> to be Filled.`, msgOpts);
                     openOrders[OrderId].Remaining = Remaining;
                     openOrders[OrderId].Total = Total;
                     openOrders[OrderId].Amount = Amount;
@@ -179,9 +223,13 @@ async function updateOpenOrders() {
                 continue;
             }
             openOrders[OrderId] = { Market, Type, Rate, Amount, Total, Remaining, TimeStamp };
-            if (!init) telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
+            if (!init && config.orderReceivedAlert) telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
         }
+    } catch (e) {
+        console.error("Error in update OpenOrders", e);
+    }
 
+    try {
         let notIncluded = [];
 
         if (!init) Object.keys(openOrders).forEach(key => !IDs.includes(key) && notIncluded.push(key));
@@ -194,18 +242,18 @@ async function updateOpenOrders() {
                 let { Type, Rate, Amount, Total } = Data[j];
                 notIncluded.forEach(val => {
                     if (openOrders[val].Type == Type && openOrders[val].Rate == Rate && openOrders[val].Amount == Amount && openOrders[val].Total == Total) {
-                        telegram.sendMessage(config.ownerID, `[<b>Completely Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order Completely Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${Amount} ${config.Currency}</b> with <b>${Total} BTC</b>.`, msgOpts);
+                        if (config.orderFilledAlert) telegram.sendMessage(config.ownerID, `[<b>Completely Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order Completely Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${Amount} ${config.Currency}</b> with <b>${Total} BTC</b>.`, msgOpts);
                         needToDelete.push(val);
                     }
                 });
             }
-            notIncluded.forEach(val => delete openOrders[val]);
+            needToDelete.forEach(val => delete openOrders[val]);
         }
 
         jsonFile.writeFileSync(openOrdersPath, openOrders, { spaces: 2 });
         setTimeout(updateOpenOrders, config.updateOrdersTimeInMin * 60 * 1000);
     } catch (e) {
-        throw e;
+        console.error("Error in Get Trade History.", e);
     }
 }
 //===
