@@ -56,7 +56,10 @@ telegram.onText(/\/submitOrder (.+)/, async(msg, match) => {
             let { Success, Data } = await Cryptopia.submitTrade({ Market: config.Market, Type: tradeType, Rate: parseFloat(args[1]), Amount: parseFloat(args[2]) });
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             telegram.sendMessage(config.ownerID, `[<b>Order Submitted</b>]\nOrderID: <code>${Data.OrderId}</code>\n${tradeType}ing <b>${args[2]} ${config.Currency}</b>\nAt Price: <b>${args[1]} BTC</b>`, msgOpts);
-
+            if (Data.FilledOrders.length != 0) {
+                let txt = Data.OrderId == null ? "Completely" : "Partly";
+                telegram.sendMessage(config.ownerID, `<b>Order ${txt} Filled !</b>`, {...msgOpts, reply_to_message_id: msg.message_id });
+            }
         } catch (e) {
             telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
         }
@@ -84,12 +87,15 @@ telegram.onText(/\/cancelOrder (.+)/, async(msg, match) => {
     }
 })
 
-telegram.onText(/^\/Balance$/, async msg => {
+telegram.onText(/^\/Balance$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/Balance [currency]</code>`, msgOpts));
+telegram.onText(/^\/Balance (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
+        if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /Balance to see the Usage.")
         try {
-            let { Success, Data } = await Cryptopia.getBalance({ Currency: config.Currency });
+            let currencyToCheck = match[1].toUpperCase();
+            let { Success, Data } = await Cryptopia.getBalance({ Currency: currencyToCheck });
             if (!Success) throw new Error("Cryptopia Response Not Success.");
-            telegram.sendMessage(config.ownerID, `Total: <b>${Data[0].Total} ${config.Currency}</b>\nAvailable: <b>${Data[0].Available} ${config.Currency}</b>\nUnconfirmed: <b>${Data[0].Unconfirmed} ${config.Currency}</b>\nHeld For Trades: <b>${Data[0].HeldForTrades} ${config.Currency}</b>\nPending Withdraw: <b>${Data[0].PendingWithdraw} ${config.Currency}</b>\n`, msgOpts);
+            telegram.sendMessage(config.ownerID, `Total: <b>${Data[0].Total} ${currencyToCheck}</b>\nAvailable: <b>${Data[0].Available} ${currencyToCheck}</b>\nUnconfirmed: <b>${Data[0].Unconfirmed} ${currencyToCheck}</b>\nHeld For Trades: <b>${Data[0].HeldForTrades} ${currencyToCheck}</b>\nPending Withdraw: <b>${Data[0].PendingWithdraw} ${currencyToCheck}</b>\n`, msgOpts);
         } catch (e) {
             telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
         }
@@ -108,21 +114,11 @@ async function updateOpenOrders() {
         const { Success, Data } = await Cryptopia.getOpenOrders({ Market: config.Market });
         if (!Success) throw new Error("Cryptopia Response Not Success.");
 
-        let dataIDs = []
-
         for (var i in Data) {
             let { OrderId, Market, Type, Rate, Amount, Total, Remaining, TimeStamp } = Data[i];
-            dataIDs.push(OrderId.toString());
             if (Object.keys(openOrders).includes(OrderId.toString())) continue;
             openOrders[OrderId] = { Market, Type, Rate, Amount, Total, Remaining, TimeStamp };
-            telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <b>${OrderId}</b>\n${orderToText(openOrders[OrderId])}`, msgOpts);
-        }
-
-        for (var i in openOrders) {
-            if (!dataIDs.includes(i)) {
-                console.log(`Deleteing Order: ${i}`);
-                delete openOrders[i];
-            }
+            telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
         }
 
         jsonFile.writeFileSync(openOrdersPath, openOrders, { spaces: 2 });
@@ -165,6 +161,7 @@ function orderToText(order) {
 }
 
 function toLocaleTimeStr(timeFromCryptopia) {
-    return new Date((new Date(timeFromCryptopia)).getTime() + (1000 * 60 * new Date().getTimezoneOffset())).toLocaleString({ timeZone: config.TimeZone, hour12: true });
+    return new Date(timeFromCryptopia).toLocaleString({ timeZone: config.TimeZone, hour12: true });
+    //return new Date((new Date(timeFromCryptopia)).getTime() + (1000 * 60 * new Date().getTimezoneOffset())).toLocaleString({ timeZone: config.TimeZone, hour12: true });
 }
 //===
