@@ -11,7 +11,7 @@ A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 ## Installation
 
 1. Download the Project
-2. Run `npm install` in the directory
+2. Run `npm install` in the directory (**Make sure you installed NodeJS**)
 3. Setup your Config in `config[template].json` (**API Key, Api Secret, Bot Token, TimeZone** etc.)
 4. Rename `config[template].json` to `config.json`
 5. Rename `ownOpenOrders[template].json` to `ownOpenOrders.json`
@@ -24,6 +24,10 @@ A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 Q: How to create telegram bot ? 
 
 A: [Create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
+
+Q: How to install NodeJs ?
+
+A: [Download Here](https://nodejs.org/en/download/current/)
 
 ## Commands 
 

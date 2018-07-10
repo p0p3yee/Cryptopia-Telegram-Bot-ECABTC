@@ -1,10 +1,10 @@
 {
-    "name": "cryptopiaecaorderalert",
+    "name": "cryptopiatelegrambot",
     "version": "1.0.0",
-    "description": "Notify u when ur order filled.",
+    "description": "Telegram Bot that can Interact with Cryptopia (ECA/BTC) Market Only",
     "main": "index.js",
     "scripts": {
-        "test": "\\"
+        "start": "node app.js"
     },
     "author": "itD0g",
     "license": "ISC",
