@@ -35,8 +35,7 @@ A: You can get Bot Token after creating a bot. [See here if you don't know how t
 
 Q: How do i get Cryptopia API Key and API Secret ?
 
-A: In Cryptopia > Setting > Security > Account Security > Api Setting > Check `Enable API` (If you want to allow Withdraw, Click `Enable Withdrawal` too) > Click `New Key` > Click `Save Changes`
-   > Copy **Api Key** And **Api Secret** To config.json
+A: In Cryptopia > Setting > Security > Account Security > Api Setting > Check `Enable API` (If you want to allow Withdraw, Click `Enable Withdrawal` too) > Click `New Key` > Click `Save Changes` > Copy **Api Key** And **Api Secret** To config.json
 
 ## Commands 
 
