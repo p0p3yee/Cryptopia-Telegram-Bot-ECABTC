@@ -55,7 +55,7 @@ telegram.onText(/\/submitOrder (.+)/, async(msg, match) => {
         try {
             let { Success, Data } = await Cryptopia.submitTrade({ Market: config.Market, Type: tradeType, Rate: parseFloat(args[1]), Amount: parseFloat(args[2]) });
             if (!Success) throw new Error("Cryptopia Response Not Success.");
-            telegram.sendMessage(config.ownerID, `[<b>Order Submitted</b>]\nOrderID: <code>${Data.OrderId}</code>.`, msgOpts);
+            telegram.sendMessage(config.ownerID, `[<b>Order Submitted</b>]\nOrderID: <code>${Data.OrderId}</code>\n${tradeType}ing <b>${args[2]} ${config.Currency}</b>\nAt Price: <b>${args[1]} BTC</b>`, msgOpts);
 
         } catch (e) {
             telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
