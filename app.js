@@ -129,12 +129,10 @@ async function updateOpenOrders() {
         const { Success, Data } = await Cryptopia.getOpenOrders({ Market: config.Market });
         if (!Success) throw new Error("Cryptopia Response Not Success.");
 
-        let IDs = [];
         let init = Object.keys(openOrders).length == 0
         for (var i in Data) {
             let { OrderId, Market, Type, Rate, Amount, Total, Remaining, TimeStamp } = Data[i];
             if (Object.keys(openOrders).includes(OrderId.toString())) continue;
-            IDs.push(OrderId.toString());
             openOrders[OrderId] = { Market, Type, Rate, Amount, Total, Remaining, TimeStamp };
             if (!init) telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
         }
