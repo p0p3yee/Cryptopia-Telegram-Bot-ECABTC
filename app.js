@@ -39,6 +39,7 @@ telegram.onText(/^\/listOpenOrders$/, msg => {
         telegram.sendMessage(config.ownerID, txt, msgOpts);
     }
 });
+
 telegram.onText(/^\/submitTrade$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/submitTrade [buy/sell] [price] [amount]</code>`, msgOpts));
 telegram.onText(/\/submitTrade (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
@@ -56,7 +57,7 @@ telegram.onText(/\/submitTrade (.+)/, async(msg, match) => {
             let res = await Cryptopia.submitTrade({ Market: config.Market, Type: tradeType, Rate: parseFloat(args[1]), Amount: parseFloat(args[2]) });
             console.log(res);
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, { parse_mode: "HTML", reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 });
@@ -77,13 +78,21 @@ telegram.onText(/\/cancelTrade (.+)/, async(msg, match) => {
             let res = await Cryptopia.cancelTrade({ Type: "Trade", OrderId: parseInt(args[0]) })
             console.log(res);
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, { parse_mode: "HTML", reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 })
 
-telegram.onText(/^\/getBalance$/, msg => {
-    if (msg.from.id === config.ownerID) {}
+telegram.onText(/^\/Balance$/, async msg => {
+    if (msg.from.id === config.ownerID) {
+        try {
+            let { Success, Data } = await Cryptopia.getBalance({ Currency: config.Currency });
+            if (!Success) throw new Error("Cryptopia Response Not Success.");
+            telegram.sendMessage(config.ownerID, `Total: <b>${Data[0].Total} ${config.Currency}</b>\nAvailable: <b>${Data[0].Available} ${config.Currency}</b>\nUnconfirmed: <b>${Data[0].Unconfirmed} ${config.Currency}</b>\nHeld For Trades: <b>${Data[0].HeldForTrades} ${config.Currency}</b>\nPending Withdraw: <b>${Data[0].PendingWithdraw} ${config.Currency}</b>\n`, msgOpts);
+        } catch (e) {
+            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+        }
+    }
 })
 
 telegram.onText(/^\/help$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `${config.commands.join(", ")}`));
@@ -134,7 +143,7 @@ async function updateTradeHistory() {
                 if (!fullyFilled) openOrders[TradeId].Remaining -= Amount;
                 else delete openOrders[TradeId];
 
-                telegram.sendMessage(config.ownerID, `[<b>${txt} Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order ${txt} Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${Amount} ECA</b> with <b>${Total} BTC</b>.${!fullyFilled ? `\n<b>${openOrders[TradeId].Remaining} ECA</b> to be Filled.` : ""}`, msgOpts);
+                telegram.sendMessage(config.ownerID, `[<b>${txt} Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order ${txt} Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${Amount} ${config.Currency}</b> with <b>${Total} BTC</b>.${!fullyFilled ? `\n<b>${openOrders[TradeId].Remaining} ${config.Currency}</b> to be Filled.` : ""}`, msgOpts);
             }
         }
         if(updated) jsonFile.writeFileSync(openOrdersPath, openOrders, {spaces: 2})
@@ -148,7 +157,7 @@ async function updateTradeHistory() {
 
 //Utilities
 function orderToText(order) {
-    return `Type: <b>${order.Type}</b>\nRate: <b>${(order.Rate).toFixed(8)}</b>\nAmount: <b>${order.Amount} ECA</b>.\nTotal: <b>${order.Total} BTC</b>\nRemaining: <b>${order.Remaining} ECA</b>\nCreate At: <b>${toLocaleTimeStr(order.TimeStamp)}</b>`
+    return `Type: <b>${order.Type}</b>\nRate: <b>${(order.Rate).toFixed(8)}</b>\nAmount: <b>${order.Amount} ${config.Currency}</b>.\nTotal: <b>${order.Total} BTC</b>\nRemaining: <b>${order.Remaining} ${config.Currency}</b>\nCreate At: <b>${toLocaleTimeStr(order.TimeStamp)}</b>`
 }
 
 function toLocaleTimeStr(timeFromCryptopia) {
