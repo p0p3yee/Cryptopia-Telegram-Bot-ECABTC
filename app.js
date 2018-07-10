@@ -22,7 +22,7 @@ updateOpenOrders();
 
 //Telegram Commands Handle
 telegram.onText(/^\/start$/, msg => {
-    if (config.ownerID.length <= 0 || config.ownerID == null) {
+    if (config.ownerID == null) {
         config.ownerID = msg.from.id
         jsonFile.writeFileSync(configPath, config, { spaces: 2 });
         telegram.sendMessage(msg.chat.id, `You are now the owner of the Bot.\nOnly you are allowed to use all the commands.`, { reply_to_message_id: msg.message_id });
