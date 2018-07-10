@@ -22,36 +22,36 @@ A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 
 ## Help
 
-Q: >How to create telegram bot ? 
+Q: > How to create telegram bot ? 
 
 A: [Create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
 
-Q: >How to install NodeJs ?
+Q: > How to install NodeJs ?
 
 A: [Download Here](https://nodejs.org/en/download/current/)
 
-Q: >How do i get Bot Token ?
+Q: > How do i get Bot Token ?
 
 A: You can get Bot Token after creating a bot. [See here if you don't know how to create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
 
-Q: >How do i get Cryptopia API Key and API Secret ?
+Q: > How do i get Cryptopia API Key and API Secret ?
 
 A: In Cryptopia > Setting > Security > Account Security > Api Setting > Check `Enable API` (If you want to allow Withdraw, Click `Enable Withdrawal` too) > Click `New Key` > Click `Save Changes` > Copy **Api Key** And **Api Secret** To config.json
 
-Q: >What are `npm install` and `node app.js` mean ?
+Q: > What are `npm install` and `node app.js` mean ?
 
 A: These are the commands that you can execute after installed NodeJs and they are execute on **cmd** or **Terminal**
 
-Q: >How do i execute `npm install` and `node app.js` ? 
+Q: > How do i execute `npm install` and `node app.js` ? 
 
 A: Open **Terminal** if you are using Linux/Mac, Open **cmd** if you are using Windows, and then type: `cd [directory]`. The `[directory]` is the folder that you just downlaoded. For example: your folder is in `~/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`, then you type `cd ~/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`. Another Example: if your folder is in `C:/Users/abc/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`, then you type `cd C:/Users/abc/Downloads/Cryptopia-Telegram-Bot-ECABTC-master`. After changed directory, you can now type `npm install` or `node app.js`.
 
-Q: >Why do i get an Error after execute `node app.js` ?
+Q: > Why do i get an Error after execute `node app.js` ?
 
 A: if this look like your error message: 
 `(node:1477) UnhandledPromiseRejectionWarning: privateRequest(), Error on privateRequest: StatusCodeError: 401 - ""`. That means your **apiKey** or **apiSecret** is incorrect. Remember to **Save Changes** in Cryptopia.
 
-Q: >Thats not my Error Message !
+Q: > Thats not my Error Message !
 
 A: Contact me on [Telegram](https://t.me/itD0g) **OR** Create a **New Issue** in this Repo.
 
