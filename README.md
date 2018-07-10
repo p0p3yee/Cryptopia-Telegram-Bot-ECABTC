@@ -41,6 +41,12 @@ Find me if you have any question about the bot.
 
 **itD0g** - [Telegram](https://t.me/itD0g)
 
+## Donation
+
+1. BTC : `18tfrh9fA4XZz9b4mNP2t9AaYDa1XGR1FM`
+2. ETH : `0x54DD3A68C8d0A7930A09f90F7a1ea15c2D2abC5E`
+3. ECA : `EKAad7P8hLQ5x4g758keYUAKVfjryGrhKU`
+
 ## Disclaimer
 
 **In no event shall this bot or its dev(me) be responsible for any loss.**
