@@ -33,6 +33,11 @@ Q: How do i get Bot Token ?
 
 A: You can get Bot Token after creating a bot. [See here if you don't know how to create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
 
+Q: How do i get Cryptopia API Key and API Secret ?
+
+A: In Cryptopia > Setting > Security > Account Security > Api Setting > Check `Enable API` (If you want to allow Withdraw, Click `Enable Withdrawal` too) > Click `New Key` > Click `Save Changes`
+   > Copy **Api Key** And **Api Secret** To config.json
+
 ## Commands 
 
 1. Get Specific Currency's Balance in Cryptopia: `/Balance [Currency]`
