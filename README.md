@@ -29,6 +29,10 @@ Q: How to install NodeJs ?
 
 A: [Download Here](https://nodejs.org/en/download/current/)
 
+Q: How do i get Bot Token ?
+
+A: You can get Bot Token after creating a bot. [See here if you don't know how to create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
+
 ## Commands 
 
 1. Get Specific Currency's Balance in Cryptopia: `/Balance [Currency]`
