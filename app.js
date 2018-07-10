@@ -32,7 +32,7 @@ telegram.onText(/^\/start$/, msg => {
     }
 });
 
-telegram.onText(/^\/listOpenOrders$/, msg => {
+telegram.onText(/^\/listOrders$/, msg => {
     if (msg.from.id === config.ownerID) {
         let txt = "===<b>Open Orders</b>===\n";
         for (var i in openOrders) txt += `OrderID: <code>${i}</code>\n${orderToText(openOrders[i])}\n\n`;
@@ -40,43 +40,44 @@ telegram.onText(/^\/listOpenOrders$/, msg => {
     }
 });
 
-telegram.onText(/^\/submitTrade$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/submitTrade [buy/sell] [price] [amount]</code>`, msgOpts));
-telegram.onText(/\/submitTrade (.+)/, async(msg, match) => {
+telegram.onText(/^\/submitOrder$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/submitOrder [buy/sell] [price] [amount]</code>`, msgOpts));
+telegram.onText(/\/submitOrder (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
         let args = match[1].trim().split(" ");
         if (args.length < 3) {
-            telegram.sendMessage(config.ownerID, `Not enough Arguments.\nType /submitTrade to see the Usage.`, msgOpts);
+            telegram.sendMessage(config.ownerID, `Not enough Arguments.\nType /submitOrder to see the Usage.`, msgOpts);
             return;
         } else if (!isNaN(args[0]) || isNaN(args[1]) || isNaN(args[2]) || (args[0].toLowerCase() !== "buy" && args[0].toLowerCase() !== "sell")) {
-            telegram.sendMessage(config.ownerID, `Incorrect Arguments.\nType /submitTrade to see the Usage.`, msgOpts);
+            telegram.sendMessage(config.ownerID, `Incorrect Arguments.\nType /submitOrder to see the Usage.`, msgOpts);
             return;
         }
         let tradeType = args[0].toLowerCase() === "buy" ? "Buy" : "Sell";
-        console.log(`${args[0]} ${args[1]} ${args[2]}`);
         try {
-            let res = await Cryptopia.submitTrade({ Market: config.Market, Type: tradeType, Rate: parseFloat(args[1]), Amount: parseFloat(args[2]) });
-            console.log(res);
+            let { Success, Data } = await Cryptopia.submitTrade({ Market: config.Market, Type: tradeType, Rate: parseFloat(args[1]), Amount: parseFloat(args[2]) });
+            if (!Success) throw new Error("Cryptopia Response Not Success.");
+            telegram.sendMessage(config.ownerID, `[<b>Order Submitted</b>]\nOrderID: <code>${Data.OrderId}</code>.`, msgOpts);
+
         } catch (e) {
             telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 });
 
-telegram.onText(/^\/cancelTrade$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/cancelTrade [orderid]</code>`, msgOpts));
-telegram.onText(/\/cancelTrade (.+)/, async(msg, match) => {
+telegram.onText(/^\/cancelOrder$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/cancelOrder [orderid]</code>`, msgOpts));
+telegram.onText(/\/cancelOrder (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
         let args = match[1].trim().split(" ");
         if (args.length < 1) {
-            telegram.sendMessage(config.ownerID, `Not enough Arguments.\nType /cancelTrade to see the Usage.`, msgOpts);
+            telegram.sendMessage(config.ownerID, `Not enough Arguments.\nType /cancelOrder to see the Usage.`, msgOpts);
             return;
         } else if (isNaN(args[0])) {
-            telegram.sendMessage(config.ownerID, `Incorrect Arguments.\nType /cancelTrade to see the Usage.`, msgOpts);
+            telegram.sendMessage(config.ownerID, `Incorrect Arguments.\nType /cancelOrder to see the Usage.`, msgOpts);
             return;
         }
-        console.log(`${args[0]}`);
         try {
-            let res = await Cryptopia.cancelTrade({ Type: "Trade", OrderId: parseInt(args[0]) })
-            console.log(res);
+            let { Success, Data } = await Cryptopia.cancelTrade({ Type: "Trade", OrderId: parseInt(args[0]) })
+            if (!Success) throw new Error("Cryptopia Response Not Success.");
+            telegram.sendMessage(config.ownerID, `[<b>Order Canceled</b>]\nOrderID: <code>${Data[0]}</code>.`, msgOpts)
         } catch (e) {
             telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
         }
@@ -118,7 +119,10 @@ async function updateOpenOrders() {
         }
 
         for (var i in openOrders) {
-            if (!dataIDs.includes(i)) delete openOrders[i];
+            if (!dataIDs.includes(i)) {
+                console.log(`Deleteing Order: ${i}`);
+                delete openOrders[i];
+            }
         }
 
         jsonFile.writeFileSync(openOrdersPath, openOrders, { spaces: 2 });
@@ -157,7 +161,7 @@ async function updateTradeHistory() {
 
 //Utilities
 function orderToText(order) {
-    return `Type: <b>${order.Type}</b>\nRate: <b>${(order.Rate).toFixed(8)}</b>\nAmount: <b>${order.Amount} ${config.Currency}</b>.\nTotal: <b>${order.Total} BTC</b>\nRemaining: <b>${order.Remaining} ${config.Currency}</b>\nCreate At: <b>${toLocaleTimeStr(order.TimeStamp)}</b>`
+    return `Type: <b>${order.Type}</b>\nPrice: <b>${(order.Rate).toFixed(8)} BTC</b>\nAmount: <b>${order.Amount} ${config.Currency}</b>.\nTotal: <b>${order.Total} BTC</b>\nRemaining: <b>${order.Remaining} ${config.Currency}</b>\nCreate At: <b>${toLocaleTimeStr(order.TimeStamp)}</b>`
 }
 
 function toLocaleTimeStr(timeFromCryptopia) {

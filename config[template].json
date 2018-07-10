@@ -9,5 +9,5 @@
     "TimeZone": "Asia/Hong_Kong",
     "updateOrdersTimeInMin": 1,
     "updateTradeHistroyTimeInMin": 1.5,
-    "commands": ["/listOpenOrders", "/submitTrade", "/cancelTrade", "/Balance"]
+    "commands": ["/listOrders", "/submitOrder", "/cancelOrder", "/Balance"]
 }
