@@ -35,7 +35,7 @@ telegram.onText(/^\/start$/, msg => {
 telegram.onText(/^\/listOpenOrders$/, msg => {
     if (msg.from.id === config.ownerID) {
         let txt = "===<b>Open Orders</b>===\n";
-        for (var i in openOrders) txt += `OrderID: <b>${i}</b>\n${orderToText(openOrders[i])}\n\n`;
+        for (var i in openOrders) txt += `OrderID: <code>${i}</code>\n${orderToText(openOrders[i])}\n\n`;
         telegram.sendMessage(config.ownerID, txt, msgOpts);
     }
 });
