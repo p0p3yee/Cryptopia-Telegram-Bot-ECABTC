@@ -102,6 +102,21 @@ telegram.onText(/^\/Balance (.+)/, async(msg, match) => {
     }
 })
 
+telegram.onText(/^\/Deposit$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/Deposit [currency]</code>`, msgOpts));
+telegram.onText(/^\/Deposit (.+)/, async(msg, match) => {
+    if (msg.from.id === config.ownerID) {
+        if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /Deposit to see the Usage.")
+        try {
+            let currencyToCheck = match[1].toUpperCase();
+            let { Success, Data } = await Cryptopia.getDepositAddress({ Currency: currencyToCheck });
+            if (!Success) throw new Error("Cryptopia Response Not Success.");
+            telegram.sendMessage(config.ownerID, `Deposit Address of <b>${currencyToCheck}</b>:\n\n<code>${Data.Address}</code>`, msgOpts);
+        } catch (e) {
+            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+        }
+    }
+})
+
 telegram.onText(/^\/help$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `${config.commands.join(", ")}`));
 
 telegram.on("polling_error", error => console.error(error));
@@ -123,7 +138,6 @@ async function updateOpenOrders() {
             openOrders[OrderId] = { Market, Type, Rate, Amount, Total, Remaining, TimeStamp };
             if (!init) telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
         }
-        console.log(openOrders);
         for (var i in openOrders) {
             if (!IDs.includes(i)) delete openOrders[i];
         }

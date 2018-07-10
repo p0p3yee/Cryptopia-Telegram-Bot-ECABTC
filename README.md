@@ -31,6 +31,7 @@ A: [Create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
 2. Place Buy/Sell ECA Order: `/submitTrade [Buy/Sell] [Price in BTC] [ECA Amount]`
 3. Cancel Buy/Sell ECA Order: `/cancelOrder [OrderID]`
 4. List all ECA Open Orders: `/listOpenOrders`
+5. Get Deposit Address of Specific Currency in Cryptopia: `/Deposit [Currency]`
 
 ## Built With
 
