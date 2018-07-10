@@ -18,7 +18,6 @@ Cryptopia.setOptions({
     API_SECRET: config.apiSecret
 });
 updateOpenOrders();
-updateTradeHistory();
 //====
 
 //Telegram Commands Handle
@@ -116,6 +115,29 @@ telegram.onText(/^\/Deposit (.+)/, async(msg, match) => {
         }
     }
 })
+telegram.onText(/^\/getMarket$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/getMarket [Currency_BaseCurrency]</code>`, msgOpts));
+telegram.onText(/^\/getMarket (.+)/, async(msg, match) => {
+    if (msg.from.id === config.ownerID) {
+        if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /getMarket to see the Usage.")
+        try {
+
+        } catch (e) {
+            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+        }
+    }
+})
+
+telegram.onText(/^\/getMarketOrders$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/getMarketOrders [Currency_BaseCurrency]</code>`, msgOpts));
+telegram.onText(/^\/getMarketOrders (.+)/, async(msg, match) => {
+    if (msg.from.id === config.ownerID) {
+        if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /getMarketOrders to see the Usage.")
+        try {
+
+        } catch (e) {
+            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+        }
+    }
+})
 
 telegram.onText(/^\/help$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `${config.commands.join(", ")}`));
 
@@ -130,40 +152,45 @@ async function updateOpenOrders() {
         if (!Success) throw new Error("Cryptopia Response Not Success.");
 
         let init = Object.keys(openOrders).length == 0
+        let IDs = [];
         for (var i in Data) {
             let { OrderId, Market, Type, Rate, Amount, Total, Remaining, TimeStamp } = Data[i];
-            if (Object.keys(openOrders).includes(OrderId.toString())) continue;
+            IDs.push(OrderId.toString());
+            if (Object.keys(openOrders).includes(OrderId.toString())) {
+                if (openOrders[OrderId].Remaining != Remaining) {
+                    telegram.sendMessage(config.ownerID, `[<b>Partly Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order Partly Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${openOrders[OrderId].Amount - Amount} ${config.Currency}</b> with <b>${openOrders[OrderId].Total - Total} BTC</b>.\n<b>${Remaining} ${config.Currency}</b> to be Filled.`, msgOpts);
+                    openOrders[OrderId].Remaining = Remaining;
+                    openOrders[OrderId].Total = Total;
+                    openOrders[OrderId].Amount = Amount;
+                }
+                continue;
+            }
             openOrders[OrderId] = { Market, Type, Rate, Amount, Total, Remaining, TimeStamp };
             if (!init) telegram.sendMessage(config.ownerID, `[<b>New Order Received</b>]\nOrderID: <code>${OrderId}</code>\n${orderToText(openOrders[OrderId])}`, msgOpts);
         }
 
+        let notIncluded = [];
+
+        if (!init) Object.keys(openOrders).forEach(key => !IDs.includes(key) && notIncluded.push(key));
+
+        if (notIncluded.length > 0) {
+            let { Success, Data } = await Cryptopia.getTradeHistory({ Market: config.Market });
+            if (!Success) throw new Error("Cryptopia Response Not Success.");
+            let needToDelete = [];
+            for (var j in Data) {
+                let { Type, Rate, Amount, Total } = Data[j];
+                notIncluded.forEach(val => {
+                    if (openOrders[val].Type == Type && openOrders[val].Rate == Rate && openOrders[val].Amount == Amount && openOrders[val].Total == Total) {
+                        telegram.sendMessage(config.ownerID, `[<b>Completely Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order Completely Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${Amount} ${config.Currency}</b> with <b>${Total} BTC</b>.`, msgOpts);
+                        needToDelete.push(val);
+                    }
+                });
+            }
+            notIncluded.forEach(val => delete openOrders[val]);
+        }
+
         jsonFile.writeFileSync(openOrdersPath, openOrders, { spaces: 2 });
         setTimeout(updateOpenOrders, config.updateOrdersTimeInMin * 60 * 1000);
-    } catch (e) {
-        throw e;
-    }
-}
-
-async function updateTradeHistory() {
-    try {
-        const { Success, Data } = await Cryptopia.getTradeHistory({ Market: config.Market });
-        if (!Success) throw new Error("Cryptopia Response Not Success.");
-        let updated = false;
-        for (var i in Data) {
-            let { TradeId, Type, Rate, Amount, Total } = Data[i];
-            if (Object.keys(openOrders).includes(TradeId.toString())) {
-                updated = true;
-                let fullyFilled = Amount == openOrders[TradeId].Amount
-                let txt = fullyFilled ? "Completely" : "Partly";
-
-                if (!fullyFilled) openOrders[TradeId].Remaining -= Amount;
-                else delete openOrders[TradeId];
-
-                telegram.sendMessage(config.ownerID, `[<b>${txt} Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order ${txt} Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${Amount} ${config.Currency}</b> with <b>${Total} BTC</b>.${!fullyFilled ? `\n<b>${openOrders[TradeId].Remaining} ${config.Currency}</b> to be Filled.` : ""}`, msgOpts);
-            }
-        }
-        if(updated) jsonFile.writeFileSync(openOrdersPath, openOrders, {spaces: 2})
-        setTimeout(updateTradeHistory, config.updateTradeHistroyTimeInMin * 60 * 1000);
     } catch (e) {
         throw e;
     }

@@ -8,6 +8,5 @@
     "Currency": "ECA",
     "TimeZone": "Asia/Hong_Kong",
     "updateOrdersTimeInMin": 1,
-    "updateTradeHistroyTimeInMin": 1.5,
     "commands": ["/listOrders", "/submitOrder", "/cancelOrder", "/Balance", "/Deposit"]
 }
