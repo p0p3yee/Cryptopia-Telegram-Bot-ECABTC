@@ -12,7 +12,7 @@ A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 
 1. Download the Project
 2. Run `npm install` in the directory
-3. Setup your **API Key** & **API Secret** & **Bot Token** in `config[template].json`
+3. Setup your Config in `config[template].json` (**API Key, Api Secret, Bot Token, TimeZone**)
 4. Rename `config[template].json` to `config.json`
 5. Rename `ownOpenOrders[template].json` to `ownOpenOrders.json`
 5. Run `node app.js` in the directory
@@ -21,7 +21,8 @@ A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 
 ## Help
 
-1. Q: How to create telegram bot ? A: [Create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
+Q: How to create telegram bot ? 
+A: [Create Telegram Bot](https://core.telegram.org/bots#3-how-do-i-create-a-bot)
 
 ## Commands 
 
@@ -43,9 +44,9 @@ Find me if you have any question about the bot.
 
 ## Donation
 
-1. BTC : `18tfrh9fA4XZz9b4mNP2t9AaYDa1XGR1FM`
-2. ETH : `0x54DD3A68C8d0A7930A09f90F7a1ea15c2D2abC5E`
-3. ECA : `EKAad7P8hLQ5x4g758keYUAKVfjryGrhKU`
+1. **BTC** : `18tfrh9fA4XZz9b4mNP2t9AaYDa1XGR1FM`
+2. **ETH** : `0x54DD3A68C8d0A7930A09f90F7a1ea15c2D2abC5E`
+3. **ECA** : `EKAad7P8hLQ5x4g758keYUAKVfjryGrhKU`
 
 ## Disclaimer
 
