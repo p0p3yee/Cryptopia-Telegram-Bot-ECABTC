@@ -39,11 +39,14 @@ A: In Cryptopia > Setting > Security > Account Security > Api Setting > Check `E
 
 ## Commands 
 
-1. Get Specific Currency's Balance in Cryptopia: `/Balance [Currency]`
-2. Place Buy/Sell ECA Order: `/submitTrade [Buy/Sell] [Price in BTC] [ECA Amount]`
-3. Cancel Buy/Sell ECA Order: `/cancelOrder [OrderID]`
-4. List all ECA Open Orders: `/listOpenOrders`
-5. Get Deposit Address of Specific Currency in Cryptopia: `/Deposit [Currency]`
+1. `/Balance [Currency]` : Get Specific Currency's Balance in Cryptopia.
+2. `/submitOrder [Buy/Sell] [Price in BTC] [ECA Amount]` : Place Buy/Sell ECA Order.
+3. `/cancelOrder [OrderID]` : Cancel Buy/Sell ECA Order.
+4. `/listOrders` : List all ECA Open Orders.
+5. `/Deposit [Currency]` : Get Deposit Address of Specific Currency in Cryptopia.
+6. `/getMarket [Currency_BaseCurrency]` : Get Market of the Specific Market, For example: `/getMarket ECA_BTC`, get ECA_BTC Market.
+7. `/getMarketOrders [Currency_BaseCurrency]` Get Market Orders of the Specific Market, For example: `/getMarketOrders ECA_BTC`, get ECA_BTC Market Orders.
+
 
 ## Built With
 

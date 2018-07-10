@@ -10,6 +10,8 @@ let config = {};
 let openOrders = {};
 
 //Initialize
+console.clear();
+console.log("Initializing the bot...");
 config = jsonFile.readFileSync(configPath);
 openOrders = jsonFile.readFileSync(openOrdersPath);
 const telegram = new tg(config.botToken, { polling: true });
@@ -18,6 +20,7 @@ Cryptopia.setOptions({
     API_SECRET: config.apiSecret
 });
 updateOpenOrders();
+console.log("Bot Initialized.");
 //====
 
 //Telegram Commands Handle
@@ -26,6 +29,8 @@ telegram.onText(/^\/start$/, msg => {
         config.ownerID = msg.from.id
         jsonFile.writeFileSync(configPath, config, { spaces: 2 });
         telegram.sendMessage(msg.chat.id, `You are now the owner of the Bot.\nOnly you are allowed to use all the commands.`, { reply_to_message_id: msg.message_id });
+    } else if (config.ownerID == msg.from.id) {
+        telegram.sendMessage(config.ownerID, `You already is the owner of this Bot :)`);
     } else {
         telegram.sendMessage(msg.chat.id, `This is a private bot and already have owner.`, { reply_to_message_id: msg.message_id });
     }
@@ -60,7 +65,7 @@ telegram.onText(/\/submitOrder (.+)/, async(msg, match) => {
                 telegram.sendMessage(config.ownerID, `<b>Order ${txt} Filled !</b>`, {...msgOpts, reply_to_message_id: msg.message_id });
             }
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 });
@@ -81,7 +86,7 @@ telegram.onText(/\/cancelOrder (.+)/, async(msg, match) => {
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             telegram.sendMessage(config.ownerID, `[<b>Order Canceled</b>]\nOrderID: <code>${Data[0]}</code>.`, msgOpts)
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 })
@@ -96,7 +101,7 @@ telegram.onText(/^\/Balance (.+)/, async(msg, match) => {
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             telegram.sendMessage(config.ownerID, `Total: <b>${Data[0].Total} ${currencyToCheck}</b>\nAvailable: <b>${Data[0].Available} ${currencyToCheck}</b>\nUnconfirmed: <b>${Data[0].Unconfirmed} ${currencyToCheck}</b>\nHeld For Trades: <b>${Data[0].HeldForTrades} ${currencyToCheck}</b>\nPending Withdraw: <b>${Data[0].PendingWithdraw} ${currencyToCheck}</b>\n`, msgOpts);
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 })
@@ -111,7 +116,7 @@ telegram.onText(/^\/Deposit (.+)/, async(msg, match) => {
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             telegram.sendMessage(config.ownerID, `Deposit Address of <b>${currencyToCheck}</b>:\n\n<code>${Data.Address}</code>`, msgOpts);
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 })
@@ -120,9 +125,14 @@ telegram.onText(/^\/getMarket (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
         if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /getMarket to see the Usage.")
         try {
-
+            const { Success, Data } = await Cryptopia.getMarket({ Market: match[1].toUpperCase() });
+            if (!Success) throw new Error("Cryptopia Response Not Success.");
+            if (Data == null) throw new Error("Incorrect Market.\nType /getMarket to see the Usage.")
+            let txt = "";
+            Object.keys(Data).forEach(key => txt += `${key}: <b>${typeof Data[key] === "number" ? (Data[key]).toFixed(8) : Data[key]}</b>\n`);
+            telegram.sendMessage(config.ownerID, txt, {...msgOpts, reply_to_message_id: msg.message_id })
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 })
@@ -132,9 +142,12 @@ telegram.onText(/^\/getMarketOrders (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
         if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /getMarketOrders to see the Usage.")
         try {
-
+            const { Success, Data } = await Cryptopia.getMarketOrders({ Market: match[1].toUpperCase() });
+            if (!Success) throw new Error("Cryptopia Response Not Success.");
+            if (Data == null) throw new Error("Incorrect Market.\nType /getMarketOrders to see the Usage.")
+            telegram.sendMessage(config.ownerID, `Coming Soon...`, {...msgOpts, reply_to_message_id: msg.message_id });
         } catch (e) {
-            telegram.sendMessage(config.ownerID, e, {...msgOpts, reply_to_message_id: msg.message_id });
+            telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
         }
     }
 })
