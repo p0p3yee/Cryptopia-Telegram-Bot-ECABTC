@@ -3,17 +3,20 @@ const tg = require("node-telegram-bot-api")
 const Cryptopia = require("cryptopia-api")();
 const jsonFile = require("jsonfile");
 const openOrdersPath = ("./ownOpenOrders.json");
+const orderHistoryPath = ("./sumbitOrderHistory.json");
 const configPath = ("./config.json");
 
 const msgOpts = { parse_mode: "HTML" };
-let config = {};
-let openOrders = {};
+let config = {},
+    openOrders = {},
+    orderHistory = {};
 
 //Initialize
 console.clear();
 console.log("Initializing the bot...");
 config = jsonFile.readFileSync(configPath);
 openOrders = jsonFile.readFileSync(openOrdersPath);
+orderHistory = jsonFile.readFileSync(orderHistoryPath);
 const telegram = new tg(config.botToken, { polling: true });
 Cryptopia.setOptions({
     API_KEY: config.apiKey,
@@ -39,7 +42,7 @@ telegram.onText(/^\/start$/, msg => {
 telegram.onText(/^\/listOrders$/, msg => {
     if (msg.from.id === config.ownerID) {
         let txt = "===<b>Open Orders</b>===\n";
-        for (var i in openOrders) txt += `OrderID: <code>${i}</code>\n${orderToText(openOrders[i])}\n\n`;
+        for (var i in openOrders) txt += `OrderID: <code>${i}</code>\n${orderToText(openOrders[i])}\n${orderHistory[i] != null ? `Total when submit Order: <b>${orderHistory[i].toFixed(8)} BTC</b>\n` : ""}\n`;
         telegram.sendMessage(config.ownerID, txt, msgOpts);
     }
 });
@@ -63,6 +66,20 @@ telegram.onText(/\/submitOrder (.+)/, async(msg, match) => {
             if (Data.FilledOrders.length != 0 && config.orderFilledAlert) {
                 let txt = Data.OrderId == null ? "Completely" : "Partly";
                 telegram.sendMessage(config.ownerID, `<b>Order ${txt} Filled !</b>`, {...msgOpts, reply_to_message_id: msg.message_id });
+            }
+
+            if(Data.OrderId != null){
+                const resp = await Cryptopia.getMarketOrders({ Market: "ECA_BTC" });
+                if (!resp.Success) throw new Error("Cryptopia Response Not Success.");
+                let {Buy, Sell} = resp.Data;
+                let dataToFind = tradeType === "Buy" ? Buy : Sell;
+                for(var i in dataToFind){
+                    if(dataToFind[i].Price.toFixed(8) == args[1]){
+                        orderHistory[Data.OrderId] = dataToFind[i].Total;
+                        jsonFile.writeFileSync(orderHistoryPath, orderHistory, {spaces: 2});
+                        break;
+                    }
+                };
             }
         } catch (e) {
             telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
@@ -142,7 +159,7 @@ telegram.onText(/^\/getMarketOrders (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
         if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /getMarketOrders to see the Usage.")
         try {
-            telegram.sendMessage(config.ownerID, "Getting Data From Cryptopia Now...", {...msgOpts, reply_to_message_id: msg.message_id});
+            telegram.sendMessage(config.ownerID, "Getting Data From Cryptopia Now...");
             const { Success, Data } = await Cryptopia.getMarketOrders({ Market: match[1].toUpperCase() });
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             if (Data == null) throw new Error("Incorrect Market.\nType /getMarketOrders to see the Usage.")
@@ -252,20 +269,24 @@ async function updateOpenOrders() {
         if (notIncluded.length > 0) {
             let { Success, Data } = await Cryptopia.getTradeHistory({ Market: config.Market });
             if (!Success) throw new Error("Cryptopia Response Not Success.");
-            let needToDelete = [];
+            //let needToDelete = [];
             for (var j in Data) {
                 let { Type, Rate, Amount, Total } = Data[j];
                 notIncluded.forEach(val => {
                     if (openOrders[val].Type == Type && openOrders[val].Rate == Rate && openOrders[val].Amount == Amount && openOrders[val].Total == Total) {
                         if (config.orderFilledAlert) telegram.sendMessage(config.ownerID, `[<b>Completely Filled</b>]\nYour <b>${(Rate).toFixed(8)}</b> Order Completely Filled.\n${Type === "Buy" ? "Bought" : "Sold"}: <b>${Amount} ${config.Currency}</b> with <b>${Total} BTC</b>.`, msgOpts);
-                        needToDelete.push(val);
+                        //needToDelete.push(val);
                     }
                 });
             }
-            needToDelete.forEach(val => delete openOrders[val]);
+            notIncluded.forEach(val => {
+                delete openOrders[val];
+                if(orderHistory[val] != null) delete orderHistory[val];
+            });
         }
 
         jsonFile.writeFileSync(openOrdersPath, openOrders, { spaces: 2 });
+        if(notIncluded.length > 0) jsonFile.writeFileSync(orderHistoryPath, orderHistory, {spaces: 2});
         setTimeout(updateOpenOrders, config.updateOrdersTimeInMin * 60 * 1000);
     } catch (e) {
         console.error("Error in Get Trade History.", e);
