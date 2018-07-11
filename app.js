@@ -142,10 +142,25 @@ telegram.onText(/^\/getMarketOrders (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
         if (match[1].length < 3) throw new Error("Incorrect Arguments.\nType /getMarketOrders to see the Usage.")
         try {
+            telegram.sendMessage(config.ownerID, "Getting Data From Cryptopia Now...", {...msgOpts, reply_to_message_id: msg.message_id});
             const { Success, Data } = await Cryptopia.getMarketOrders({ Market: match[1].toUpperCase() });
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             if (Data == null) throw new Error("Incorrect Market.\nType /getMarketOrders to see the Usage.")
-            telegram.sendMessage(config.ownerID, `Coming Soon...`, {...msgOpts, reply_to_message_id: msg.message_id });
+            let {Buy, Sell} = Data;
+            let baseCurrency = match[1].toUpperCase().split("_")[1];
+            let askCurrency = match[1].toUpperCase().split("_")[0];
+            let txt = `<b>Buy Orders :\nPrice(${baseCurrency})\t|\tVolume(${askCurrency})\t|\tTotal(${baseCurrency})\n</b>`;
+            
+            for(var index in Buy){
+                if(index >= config.MarketOrdersNum)break;
+                txt += `${Buy[index].Price.toFixed(8)}\t|\t${parseInt(Buy[index].Volume).toString().length >= 8 ? parseInt(Buy[index].Volume) : Buy[index].Volume.toFixed(8 - parseInt(Buy[index].Volume).toString().length)}\t|\t${Buy[index].Total.toFixed(8)}\n`
+            };
+            txt += `<b>Sell Orders :\nPrice(${baseCurrency})\t|\tVolume(${askCurrency})\t|\tTotal(${baseCurrency})\n</b>`;
+            for(var index in Sell){
+                if(index >= config.MarketOrdersNum) break;
+                txt += `${Sell[index].Price.toFixed(8)}\t|\t${parseInt(Sell[index].Volume).toString().length >= 8 ? parseInt(Sell[index].Volume) : Sell[index].Volume.toFixed(8 - parseInt(Sell[index].Volume).toString().length)}\t|\t${Sell[index].Total.toFixed(8)}\n`
+            };
+            telegram.sendMessage(config.ownerID, txt, {...msgOpts, reply_to_message_id: msg.message_id});
         } catch (e) {
             telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
         }

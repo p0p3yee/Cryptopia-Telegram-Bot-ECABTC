@@ -7,6 +7,7 @@
     "orderReceivedAlert": false,
     "Market": "ECA/BTC",
     "Currency": "ECA",
+    "MarketOrdersNum": 6,
     "updateOrdersTimeInMin": 0.5,
     "commands": ["/listOrders", "/submitOrder", "/cancelOrder", "/Balance", "/Deposit", "/getMarket", "/getMarketOrders", "/enableFilledAlert", "/disableFilledAlert", "/enableReceiveAlert", "/disableReceiveAlert"]
 }
