@@ -266,6 +266,6 @@ function orderToText(order) {
 
 function toLocaleTimeStr(timeFromCryptopia) {
     //return new Date(timeFromCryptopia).toLocaleString({ timeZone: config.TimeZone, hour12: true });
-    return new Date((new Date(timeFromCryptopia)).getTime() + (1000 * 60 * new Date().getTimezoneOffset())).toLocaleString({ timeZone: config.TimeZone, hour12: true });
+    return new Date((new Date(timeFromCryptopia)).getTime() - (1000 * 60 * new Date().getTimezoneOffset())).toLocaleString({ hour12: true });
 }
 //===

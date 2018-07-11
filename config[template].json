@@ -7,7 +7,6 @@
     "orderReceivedAlert": false,
     "Market": "ECA/BTC",
     "Currency": "ECA",
-    "TimeZone": "Asia/Hong_Kong",
     "updateOrdersTimeInMin": 0.5,
     "commands": ["/listOrders", "/submitOrder", "/cancelOrder", "/Balance", "/Deposit", "/getMarket", "/getMarketOrders", "/enableFilledAlert", "/disableFilledAlert", "/enableReceiveAlert", "/disableReceiveAlert"]
 }
