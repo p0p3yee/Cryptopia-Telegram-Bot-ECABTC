@@ -2,6 +2,32 @@
 
 A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 
+## Why do i need this bot ?
+
+1. Mainly For **Mobile User**.
+2. Cryptopia Mobile Web Version not good enough.
+3. Cryptopia **Login Process is ANNOYING**.
+4. **Less Mobile Internet Data Usage**.
+5. **Much Faster** & **Convenience** way to use Cryptopia.
+6. No Additional Application Required (**If you already installed Telegram**)
+
+7. Will Cover to **ALL** Market in Cryptopia **Soon**
+
+## Function of the Bot
+
+1. Get Balance of Specific Currency in Cryptopia
+2. Submit Buy / Sell Trade Order
+3. Cancel Trade Order
+4. List Trade Orders
+5. Get Deposit Address of Specific Currency in Cryptopia
+6. Get Market of Specific Market in Cryptopia (BidPrice, AskPrice, Low, High, etc.)
+7. Get Market Orders of Specific Currency Market in Cryptopia (Current Market Buy / Sell Orders)
+8. New Order Received Alert
+9. Order Filled Alert
+10. Let you know your order's position in the Market **Approximately**.
+
+11. **MORE NEW FEATURES IS COMING**(Auto Trade ?), Feel free to suggest any Features.
+
 ## Requirement
 
 1. Telegram Bot Token

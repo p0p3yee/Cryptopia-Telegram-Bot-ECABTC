@@ -40,9 +40,9 @@ telegram.onText(/^\/start$/, msg => {
 });
 
 telegram.onText(/^\/listOrders$/, msg => {
-    if (msg.from.id === config.ownerID) {
-        let txt = "===<b>Open Orders</b>===\n";
-        for (var i in openOrders) txt += `OrderID: <code>${i}</code>\n${orderToText(openOrders[i])}\n${orderHistory[i] != null ? `Total when submit Order: <b>${orderHistory[i].toFixed(8)} BTC</b>\n` : ""}\n`;
+            if (msg.from.id === config.ownerID) {
+                let txt = "===<b>Open Orders</b>===\n";
+                for (var i in openOrders) txt += `OrderID: <code>${i}</code>\n${orderToText(openOrders[i])}\n${orderHistory[i] != null ? `Total when submit Order: <b>${orderHistory[i].toFixed(8)} BTC</b>\n` : ""}\n`;
         telegram.sendMessage(config.ownerID, txt, msgOpts);
     }
 });
@@ -146,7 +146,9 @@ telegram.onText(/^\/getMarket (.+)/, async(msg, match) => {
             if (!Success) throw new Error("Cryptopia Response Not Success.");
             if (Data == null) throw new Error("Incorrect Market.\nType /getMarket to see the Usage.")
             let txt = "";
-            Object.keys(Data).forEach(key => txt += `${key}: <b>${typeof Data[key] === "number" ? (Data[key]).toFixed(8) : Data[key]}</b>\n`);
+            Object.keys(Data).forEach(key =>{
+                if(key != "TradePairId") txt += `${key}: <b>${typeof Data[key] === "number" ? (Data[key]).toFixed(8) : Data[key]}</b>\n`;
+            });
             telegram.sendMessage(config.ownerID, txt, {...msgOpts, reply_to_message_id: msg.message_id })
         } catch (e) {
             telegram.sendMessage(config.ownerID, `${e}`, {...msgOpts, reply_to_message_id: msg.message_id });
