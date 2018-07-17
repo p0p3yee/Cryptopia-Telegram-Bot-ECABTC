@@ -23,6 +23,9 @@ try {
     console.warn("Terminating the Bot...");
     process.exit();
 }
+if (process.platform == 'win32') process.title = config.terminalTitle;
+else process.stdout.write(`\x1b]2;${config.terminalTitle}\x1b\x5c`);
+
 if (config.botToken == "" || config.apiKey == "" || config.apiSecret == "") {
     console.error("Please setup the botToken & apiKey & apiSecret in config.json first.");
     console.warn("Terminating the Bot...");

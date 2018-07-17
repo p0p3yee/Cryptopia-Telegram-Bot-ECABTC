@@ -2,6 +2,7 @@
     "apiKey": "",
     "apiSecret": "",
     "botToken": "",
+    "terminalTitle": "Cryptopia(ECA/BTC) Telegram Bot",
     "ownerID": null,
     "orderFilledAlert": true,
     "orderReceivedAlert": false,
