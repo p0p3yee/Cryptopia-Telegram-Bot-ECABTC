@@ -24,9 +24,10 @@ A Telegram Bot that can interact with Cryptopia ECA/BTC Market.
 7. Get Market Orders of Specific Currency Market in Cryptopia (Current Market Buy / Sell Orders)
 8. New Order Received Alert (**Only ECA/BTC Orders For NOW**)
 9. Order Filled Alert (**Only ECA/BTC Orders For NOW**)
-10. Let you know your order's position in the Market **Approximately**.
+10. Record the total BTC of the price when you submit your order **IN THE BOT**.
+11. Calculate how much ECA you can buy with specific ECA Price and BTC Amount.
 
-11. **MORE NEW FEATURES IS COMING**(Auto Trade ?), Feel free to suggest any Features.
+12. **MORE NEW FEATURES IS COMING**, Feel free to suggest any Features.
 
 ## Requirement
 
@@ -95,6 +96,7 @@ A: Contact me on [Telegram](https://t.me/itD0g) **OR** Create a **New Issue** in
 9. `/disableFilledAlert` : Turn off Order Filled Alert
 10. `/enableReceiveAlert` : Turn on New Order Received Alert
 11. `/disableReceiveAlert` : Turn off New Order Received Alert
+12. `/calc [ECA Price] [BTC Amount]` : Calculate how much ECA you can buy with the given ECA Price and BTC Amount
 
 ## How to Update the bot ?
 

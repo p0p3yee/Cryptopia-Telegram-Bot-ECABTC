@@ -119,7 +119,7 @@ telegram.onText(/\/cancelOrder (.+)/, async(msg, match) => {
     }
 })
 
-telegram.onText(/^\/calc$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/calc [ECAprice] [BTCAmount]</code>`, msgOpts));
+telegram.onText(/^\/calc$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/calc [ECA Price] [BTC Amount]</code>`, msgOpts));
 telegram.onText(/\/calc (.+)/, (msg, match) => {
     if(msg.from.id === config.ownerID){
         let args = match[1].trim().split(" ");
