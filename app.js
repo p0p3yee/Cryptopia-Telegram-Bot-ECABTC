@@ -130,7 +130,7 @@ telegram.onText(/\/calc (.+)/, (msg, match) => {
             telegram.sendMessage(config.ownerID, `Incorrect Arguments.\nType /calc to see the Usage.`, msgOpts);
             return;
         }
-        telegram.sendMessage(config.ownerID, `You can Buy <code>${(parseFloat(args[1]) / 1.002 / parseFloat(args[0])).toFixed(8)}</code> ECA\nwith <b>${args[1]} BTC</b>\nat Price: <b>${args[0]} ECA</b>`, msgOpts);
+        telegram.sendMessage(config.ownerID, `You can Buy <code>${(parseFloat(args[1]) / 1.002 / parseFloat(args[0])).toFixed(8)}</code> ECA\nwith <b>${args[1]} BTC</b>\nat Price: <b>${args[0]} BTC</b>`, msgOpts);
     }
 });
 
