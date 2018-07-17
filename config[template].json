@@ -9,5 +9,5 @@
     "Currency": "ECA",
     "MarketOrdersNum": 6,
     "updateOrdersTimeInMin": 0.5,
-    "commands": ["/listOrders", "/submitOrder", "/cancelOrder", "/Balance", "/Deposit", "/getMarket", "/getMarketOrders", "/enableFilledAlert", "/disableFilledAlert", "/enableReceiveAlert", "/disableReceiveAlert"]
+    "commands": ["/listOrders", "/submitOrder", "/calc", "/cancelOrder", "/Balance", "/Deposit", "/getMarket", "/getMarketOrders", "/enableFilledAlert", "/disableFilledAlert", "/enableReceiveAlert", "/disableReceiveAlert"]
 }

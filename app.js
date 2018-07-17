@@ -108,6 +108,22 @@ telegram.onText(/\/cancelOrder (.+)/, async(msg, match) => {
     }
 })
 
+telegram.onText(/^\/calc$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/calc [ECAprice] [BTCAmount]</code>`, msgOpts));
+telegram.onText(/\/calc (.+)/, (msg, match) => {
+    if(msg.from.id === config.ownerID){
+        let args = match[1].trim().split(" ");
+        if(args.length < 2){
+            telegram.sendMessage(config.ownerID, `Not enough Arguments.\nType /calc to see the Usage.`, msgOpts);
+            return;
+        }else if(isNaN(args[0]) || isNaN(args[1])){
+            telegram.sendMessage(config.ownerID, `Incorrect Arguments.\nType /calc to see the Usage.`, msgOpts);
+            return;
+        }
+        telegram.sendMessage(config.ownerID, `You can Buy <code>${(parseFloat(args[1]) / 1.002 / parseFloat(args[0])).toFixed(8)}</code> ECA\nwith <b>${args[1]} BTC</b>\nat Price: <b>${args[0]} ECA</b>`, msgOpts);
+    }
+});
+
+
 telegram.onText(/^\/Balance$/, msg => msg.from.id === config.ownerID && telegram.sendMessage(config.ownerID, `Usage: <code>/Balance [currency]</code>`, msgOpts));
 telegram.onText(/^\/Balance (.+)/, async(msg, match) => {
     if (msg.from.id === config.ownerID) {
