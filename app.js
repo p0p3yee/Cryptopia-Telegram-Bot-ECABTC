@@ -3,7 +3,7 @@ const tg = require("node-telegram-bot-api")
 const Cryptopia = require("cryptopia-api")();
 const jsonFile = require("jsonfile");
 const openOrdersPath = ("./ownOpenOrders.json");
-const orderHistoryPath = ("./sumbitOrderHistory.json");
+const orderHistoryPath = ("./submitOrderHistory.json");
 const configPath = ("./config.json");
 
 const msgOpts = { parse_mode: "HTML" };
