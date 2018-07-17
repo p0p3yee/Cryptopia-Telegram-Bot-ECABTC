@@ -14,9 +14,20 @@ let config = {},
 //Initialize
 console.clear();
 console.log("Initializing the bot...");
-config = jsonFile.readFileSync(configPath);
-openOrders = jsonFile.readFileSync(openOrdersPath);
-orderHistory = jsonFile.readFileSync(orderHistoryPath);
+try {
+    config = jsonFile.readFileSync(configPath);
+    openOrders = jsonFile.readFileSync(openOrdersPath);
+    orderHistory = jsonFile.readFileSync(orderHistoryPath);
+} catch (e) {
+    console.error("config.json / ownOpenOrders.json / submitOrderHistory.json Not Found.\nPlease make sure u removed [template] in those file name.")
+    console.warn("Terminating the Bot...");
+    process.exit();
+}
+if (config.botToken == "" || config.apiKey == "" || config.apiSecret == "") {
+    console.error("Please setup the botToken & apiKey & apiSecret in config.json first.");
+    console.warn("Terminating the Bot...");
+    process.exit();
+}
 const telegram = new tg(config.botToken, { polling: true });
 Cryptopia.setOptions({
     API_KEY: config.apiKey,
